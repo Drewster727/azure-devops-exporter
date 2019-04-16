@@ -156,7 +156,7 @@ func (c *AzureDevopsClient) ListReleases(project string, releaseDefinitionId int
 		*c.HostUrl,
 		"DefaultCollection",
 		url.QueryEscape(project),
-		c.ApiVerson,
+		c.ApiVersion,
 		url.QueryEscape(int64ToString(releaseDefinitionId)),
 		url.QueryEscape(int64ToString(c.LimitReleasesPerDefinition)),
 	)
