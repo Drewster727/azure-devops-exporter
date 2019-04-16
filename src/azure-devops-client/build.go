@@ -66,10 +66,13 @@ func (c *AzureDevopsClient) ListBuildDefinitions(project string) (list BuildDefi
 	c.concurrencyLock()
 
 	url := fmt.Sprintf(
-		"%v/_apis/build/definitions?api-version=4.1&$top=9999",
+		"%v/%v/%v/_apis/build/definitions?api-version=%v&$top=9999",
+		*c.HostUrl,
+		"DefaultCollection",
 		url.QueryEscape(project),
+		c.ApiVersion,
 	)
-	response, err := c.restDev().R().Get(url)
+	response, err := c.rest().R().Get(url)
 	if err := c.checkResponse(response, err); err != nil {
 		error = err
 		return
@@ -89,11 +92,14 @@ func (c *AzureDevopsClient) ListBuilds(project string) (list BuildList, error er
 	c.concurrencyLock()
 
 	url := fmt.Sprintf(
-		"%v/_apis/build/builds?api-version=4.1&maxBuildsPerDefinition=%s&deletedFilter=excludeDeleted",
+		"%v/%v/%v/_apis/build/builds?api-version=%v&maxBuildsPerDefinition=%s&deletedFilter=excludeDeleted",
+		*c.HostUrl,
+		"DefaultCollection",
 		url.QueryEscape(project),
+		c.ApiVersion,
 		url.QueryEscape(int64ToString(c.LimitBuildsPerDefinition)),
 	)
-	response, err := c.restDev().R().Get(url)
+	response, err := c.rest().R().Get(url)
 	if err := c.checkResponse(response, err); err != nil {
 		error = err
 		return
@@ -113,11 +119,14 @@ func (c *AzureDevopsClient) ListLatestBuilds(project string) (list BuildList, er
 	c.concurrencyLock()
 
 	url := fmt.Sprintf(
-		"%v/_apis/build/builds?api-version=4.1&maxBuildsPerDefinition=%s&deletedFilter=excludeDeleted",
+		"%v/%v/%v/_apis/build/builds?api-version=%v&maxBuildsPerDefinition=%s&deletedFilter=excludeDeleted",
+		*c.HostUrl,
+		"DefaultCollection",
 		url.QueryEscape(project),
+		c.ApiVersion,
 		url.QueryEscape("1"),
 	)
-	response, err := c.restDev().R().Get(url)
+	response, err := c.rest().R().Get(url)
 	if err := c.checkResponse(response, err); err != nil {
 		error = err
 		return
@@ -137,11 +146,14 @@ func (c *AzureDevopsClient) ListBuildHistory(project string, minTime time.Time) 
 	c.concurrencyLock()
 
 	url := fmt.Sprintf(
-		"%v/_apis/build/builds?api-version=4.1&minTime=%s",
+		"%v/%v/%v/_apis/build/builds?api-version=%v&minTime=%s",
+		*c.HostUrl,
+		"DefaultCollection",
 		url.QueryEscape(project),
+		c.ApiVersion,
 		url.QueryEscape(minTime.Format(time.RFC3339)),
 	)
-	response, err := c.restDev().R().Get(url)
+	response, err := c.rest().R().Get(url)
 	if err := c.checkResponse(response, err); err != nil {
 		error = err
 		return

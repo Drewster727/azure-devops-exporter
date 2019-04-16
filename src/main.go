@@ -52,8 +52,9 @@ var opts struct {
 
 	// azure settings
 	AzureDevopsUrl         *string `long:"azuredevops.url"                     env:"AZURE_DEVOPS_URL"             description:"Azure DevOps url (empty if hosted by microsoft)"`
+	AzureDevopsApiVersion   string `long:"azuredevops.api-version"             env:"AZURE_DEVOPS_API_VERSION"     description:"Azure DevOps api version"`
 	AzureDevopsAccessToken  string `long:"azuredevops.access-token"            env:"AZURE_DEVOPS_ACCESS_TOKEN"    description:"Azure DevOps access token" required:"true"`
-	AzureDevopsOrganisation string `long:"azuredevops.organisation"            env:"AZURE_DEVOPS_ORGANISATION"    description:"Azure DevOps organization" required:"true"`
+	AzureDevopsOrganisation string `long:"azuredevops.organisation"            env:"AZURE_DEVOPS_ORGANISATION"    description:"Azure DevOps organization" required:"false"`
 
 	RequestConcurrencyLimit int64 `long:"request.concurrency"                   env:"REQUEST_CONCURRENCY"     description:"Number of concurrent requests against dev.azure.com"  default:"10"`
 	RequestRetries          int   `long:"request.retries"                       env:"REQUEST_RETRIES"         description:"Number of retried requests against dev.azure.com"     default:"3"`
@@ -146,7 +147,7 @@ func initAzureConnection() {
 	if opts.AzureDevopsUrl != nil {
 		AzureDevopsClient.HostUrl = opts.AzureDevopsUrl
 	}
-
+	AzureDevopsClient.SetApiVersion(opts.AzureDevopsApiVersion)
 	AzureDevopsClient.SetOrganization(opts.AzureDevopsOrganisation)
 	AzureDevopsClient.SetAccessToken(opts.AzureDevopsAccessToken)
 	AzureDevopsClient.SetConcurrency(opts.RequestConcurrencyLimit)

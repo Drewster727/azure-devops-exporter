@@ -3,6 +3,7 @@ package AzureDevopsClient
 import (
 	"fmt"
 	"errors"
+	"strings"
 	"github.com/go-resty/resty"
 	"sync/atomic"
 )
@@ -13,6 +14,7 @@ type AzureDevopsClient struct {
 	accessToken  *string
 
 	HostUrl *string
+	ApiVersion string
 
 	restClient     *resty.Client
 	restClientDev  *resty.Client
@@ -70,6 +72,10 @@ func (c *AzureDevopsClient) SetRetries(v int) {
 	}
 }
 
+func (c *AzureDevopsClient) SetApiVersion(version string) {
+	c.ApiVersion = version
+}
+
 func (c *AzureDevopsClient) SetOrganization(url string) {
 	c.organization = &url
 }
@@ -87,8 +93,12 @@ func (c *AzureDevopsClient) rest() *resty.Client {
 			c.restClient.SetHostURL(fmt.Sprintf("https://%v.visualstudio.com/", *c.organization))
 		}
 		c.restClient.SetHeader("Accept", "application/json")
+		if strings.HasPrefix(*c.HostUrl, "http:") {
+			c.restClient.SetScheme("http")
+		}
 		c.restClient.SetBasicAuth("", *c.accessToken)
 		c.restClient.SetRetryCount(c.RequestRetries)
+		c.restClient.SetDisableWarn(true)
 		c.restClient.OnBeforeRequest(c.restOnBeforeRequest)
 		c.restClient.OnAfterResponse(c.restOnAfterResponse)
 	}
@@ -100,12 +110,16 @@ func (c *AzureDevopsClient) restDev() *resty.Client {
 	if c.restClientDev == nil {
 		c.restClientDev = resty.New()
 		if c.HostUrl != nil {
-			c.restClient.SetHostURL(*c.HostUrl)
+			c.restClientDev.SetHostURL(*c.HostUrl)
 		} else {
 			c.restClientDev.SetHostURL(fmt.Sprintf("https://dev.azure.com/%v/", *c.organization))
 		}
 		c.restClientDev.SetHeader("Accept", "application/json")
+		if strings.HasPrefix(*c.HostUrl, "http:") {
+			c.restClientDev.SetScheme("http")
+		}
 		c.restClientDev.SetBasicAuth("", *c.accessToken)
+		c.restClientDev.SetDisableWarn(true)
 		c.restClientDev.SetRetryCount(c.RequestRetries)
 		c.restClientDev.OnBeforeRequest(c.restOnBeforeRequest)
 		c.restClientDev.OnAfterResponse(c.restOnAfterResponse)
@@ -118,12 +132,16 @@ func (c *AzureDevopsClient) restVsrm() *resty.Client {
 	if c.restClientVsrm == nil {
 		c.restClientVsrm = resty.New()
 		if c.HostUrl != nil {
-			c.restClient.SetHostURL(*c.HostUrl)
+			c.restClientVsrm.SetHostURL(*c.HostUrl)
 		} else {
 			c.restClientVsrm.SetHostURL(fmt.Sprintf("https://vsrm.dev.azure.com/%v/", *c.organization))
 		}
 		c.restClientVsrm.SetHeader("Accept", "application/json")
+		if strings.HasPrefix(*c.HostUrl, "http:") {
+			c.restClientVsrm.SetScheme("http")
+		}
 		c.restClientVsrm.SetBasicAuth("", *c.accessToken)
+		c.restClientVsrm.SetDisableWarn(true)
 		c.restClientVsrm.SetRetryCount(c.RequestRetries)
 		c.restClientVsrm.OnBeforeRequest(c.restOnBeforeRequest)
 		c.restClientVsrm.OnAfterResponse(c.restOnAfterResponse)

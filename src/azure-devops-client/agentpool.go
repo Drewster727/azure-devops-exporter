@@ -30,10 +30,12 @@ func (c *AzureDevopsClient) ListAgentQueues(project string) (list AgentQueueList
 	c.concurrencyLock()
 
 	url := fmt.Sprintf(
-		"%v/_apis/distributedtask/queues",
+		"%v/%v/%v/_apis/distributedtask/queues",
+		*c.HostUrl,
+		"DefaultCollection",
 		url.QueryEscape(project),
 	)
-	response, err := c.restDev().R().Get(url)
+	response, err := c.rest().R().Get(url)
 	if err := c.checkResponse(response, err); err != nil {
 		error = err
 		return
@@ -90,7 +92,9 @@ func (c *AzureDevopsClient) ListAgentPoolAgents(agentPoolId int64) (list AgentPo
 	c.concurrencyLock()
 
 	url := fmt.Sprintf(
-		"/_apis/distributedtask/pools/%v/agents?includeCapabilities=false&includeAssignedRequest=true",
+		"%v/%v/_apis/distributedtask/pools/%v/agents?includeCapabilities=false&includeAssignedRequest=true",
+		*c.HostUrl,
+		"DefaultCollection",
 		fmt.Sprintf("%d", agentPoolId),
 	)
 	response, err := c.rest().R().Get(url)

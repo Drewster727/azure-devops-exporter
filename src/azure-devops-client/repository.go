@@ -60,10 +60,13 @@ func (c *AzureDevopsClient) ListRepositories(project string) (list RepositoryLis
 	c.concurrencyLock()
 
 	url := fmt.Sprintf(
-		"%v/_apis/git/repositories?api-version=5.0-preview.1",
+		"%v/%v/%v/_apis/git/repositories?api-version=%v",
+		*c.HostUrl,
+		"DefaultCollection",
 		url.QueryEscape(project),
+		c.ApiVersion,
 	)
-	response, err := c.restDev().R().Get(url)
+	response, err := c.rest().R().Get(url)
 	if err := c.checkResponse(response, err); err != nil {
 		error = err
 		return
@@ -82,12 +85,15 @@ func (c *AzureDevopsClient) ListCommits(project string, repository string, fromD
 	c.concurrencyLock()
 
 	url := fmt.Sprintf(
-		"_apis/git/repositories/%s/commits?searchCriteria.fromDate=%s&api-version=5.0-preview.1",
+		"%v/%v/_apis/git/repositories/%s/commits?searchCriteria.fromDate=%s&api-version=%s",
+		*c.HostUrl,
+		"DefaultCollection",
 		url.QueryEscape(repository),
 		url.QueryEscape(fromDate.Format(time.RFC3339)),
+		c.ApiVersion,
 	)
 
-	response, err := c.restDev().R().Get(url)
+	response, err := c.rest().R().Get(url)
 	if err := c.checkResponse(response, err); err != nil {
 		error = err
 		return
@@ -107,12 +113,15 @@ func (c *AzureDevopsClient) ListPushes(project string, repository string, fromDa
 	c.concurrencyLock()
 
 	url := fmt.Sprintf(
-		"_apis/git/repositories/%s/pushes?searchCriteria.fromDate=%s&api-version=5.0-preview.1",
+		"%v/%v/_apis/git/repositories/%s/pushes?searchCriteria.fromDate=%s&api-version=%s",
+		*c.HostUrl,
+		"DefaultCollection",
 		url.QueryEscape(repository),
 		url.QueryEscape(fromDate.Format(time.RFC3339)),
+		c.ApiVersion,
 	)
 
-	response, err := c.restDev().R().Get(url)
+	response, err := c.rest().R().Get(url)
 	if err := c.checkResponse(response, err); err != nil {
 		error = err
 		return
